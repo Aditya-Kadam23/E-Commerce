@@ -1,0 +1,14 @@
+# Root-level gitignore
+.DS_Store
+Thumbs.db
+*.log
+
+# Both node_modules
+node_modules/
+Backend/node_modules/
+Frontend/node_modules/
+
+# Env files
+.env
+.env.*
+*.local
