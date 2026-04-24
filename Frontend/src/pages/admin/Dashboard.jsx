@@ -61,7 +61,7 @@ const Dashboard = () => {
       data.append('images', formData.images[i]);
     }
     try {
-      await API.post('/products', data);
+      await API.post('/api/products', data);
       setFormSuccess('Product added successfully!');
       setFormData({ name: '', description: '', price: '', category: '', stock: '', images: [] });
       setShowAddProduct(false);
