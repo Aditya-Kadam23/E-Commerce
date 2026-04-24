@@ -5,16 +5,16 @@ import API from '../api/axios';
 
 const statusConfig = {
   processing: { label: 'Processing', icon: <Clock size={14} />, style: 'badge-warning' },
-  shipped:    { label: 'Shipped',    icon: <Truck size={14} />, style: 'badge-info' },
-  delivered:  { label: 'Delivered', icon: <CheckCircle size={14} />, style: 'badge-success' },
-  cancelled:  { label: 'Cancelled', icon: <XCircle size={14} />, style: 'badge-error' },
+  shipped: { label: 'Shipped', icon: <Truck size={14} />, style: 'badge-info' },
+  delivered: { label: 'Delivered', icon: <CheckCircle size={14} />, style: 'badge-success' },
+  cancelled: { label: 'Cancelled', icon: <XCircle size={14} />, style: 'badge-error' },
 };
 
 const paymentConfig = {
-  pending: { label: 'Pending',   style: 'badge-warning' },
-  paid:    { label: 'Paid',      style: 'badge-success' },
-  failed:  { label: 'Failed',    style: 'badge-error' },
-  cod:     { label: 'Cash on Delivery', style: 'badge-gray' },
+  pending: { label: 'Pending', style: 'badge-warning' },
+  paid: { label: 'Paid', style: 'badge-success' },
+  failed: { label: 'Failed', style: 'badge-error' },
+  cod: { label: 'Cash on Delivery', style: 'badge-gray' },
 };
 
 const Orders = () => {
@@ -26,7 +26,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await API.get('/order/orders');
+        const res = await API.get('/api/order/orders');
         setOrders(res.data.orderData || []);
       } catch (err) {
         console.error(err);

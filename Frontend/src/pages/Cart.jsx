@@ -16,7 +16,7 @@ const Cart = () => {
     setLoading(true);
     try {
       // BUG FIX: was using raw axios without token — now uses API instance
-      const res = await API.get('/cart');
+      const res = await API.get('/api/cart');
       setCart(res.data.cart);
       setTotal(res.data.totalAmount || 0);
     } catch (err) {
@@ -30,7 +30,7 @@ const Cart = () => {
 
   const handleRemove = async (productId) => {
     try {
-      await API.delete(`/cart/${productId}`);
+      await API.delete(`/api/cart/${productId}`);
       dispatch(removeFromCart({ productId }));
       fetchCart();
     } catch (err) {

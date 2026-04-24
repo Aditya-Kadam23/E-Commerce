@@ -19,7 +19,7 @@ const PlaceOrder = () => {
     const fetchCart = async () => {
       setLoading(true);
       try {
-        const res = await API.get('/cart');
+        const res = await API.get('/api/cart');
         if (!res.data.cart || res.data.cart.cartItems.length === 0) {
           navigate('/cart');
         }
@@ -43,11 +43,11 @@ const PlaceOrder = () => {
     setError('');
     try {
       if (paymentMethod === 'cod') {
-        await API.post('/order/orders', { shippingAddress, paymentMethod: 'cod' });
+        await API.post('/api/order/orders', { shippingAddress, paymentMethod: 'cod' });
         setSuccess(true);
         setTimeout(() => navigate('/orders'), 3000);
       } else if (paymentMethod === 'razorpay') {
-        const res = await API.post('/payment/create-order', { shippingAddress });
+        const res = await API.post('/api/payment/create-order', { shippingAddress });
         const { razorpayOrder } = res.data;
 
         // Guard: Razorpay SDK might not have loaded from CDN yet
@@ -66,7 +66,7 @@ const PlaceOrder = () => {
           order_id: razorpayOrder.id,
           handler: async (response) => {
             try {
-              await API.post('/payment/verify', {
+              await API.post('/api/payment/verify', {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,

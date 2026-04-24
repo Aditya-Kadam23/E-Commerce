@@ -35,7 +35,7 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const res = await API.get(`/products?category=${selectedCategory}&search=${searchItems}&page=${page}`);
+        const res = await API.get(`/api/products?category=${selectedCategory}&search=${searchItems}&page=${page}`);
         setProducts(res.data.products);
         setAllPages(res.data.totalPages);
       } catch (error) {
@@ -56,7 +56,7 @@ const Home = () => {
     e.stopPropagation();
     try {
       // BUG FIX: was using raw axios without auth token — now uses API instance
-      await API.post('/cart/add', { productId, quantity: 1 });
+      await API.post('/api/cart/add', { productId, quantity: 1 });
       dispatch(addToCart({ productId, quantity: 1 }));
     } catch (error) {
       console.error('Failed to add to cart:', error);

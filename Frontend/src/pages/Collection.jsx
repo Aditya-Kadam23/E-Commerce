@@ -38,7 +38,7 @@ const Collection = () => {
         if (selectedCategory) params.set('category', selectedCategory);
         if (minPrice) params.set('minPrice', minPrice);
         if (maxPrice) params.set('maxPrice', maxPrice);
-        const res = await API.get(`/products?${params}`);
+        const res = await API.get(`/api/products?${params}`);
         setProducts(res.data.products);
         setAllPages(res.data.totalPages);
       } catch (err) {
@@ -55,7 +55,7 @@ const Collection = () => {
   const handleAddToCart = async (productId, e) => {
     e.stopPropagation();
     try {
-      await API.post('/cart/add', { productId, quantity: 1 });
+      await API.post('/api/cart/add', { productId, quantity: 1 });
       dispatch(addToCart({ productId, quantity: 1 }));
     } catch (err) { console.error(err); }
   };

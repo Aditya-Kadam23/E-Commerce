@@ -36,8 +36,8 @@ const Products = () => {
       setLoading(true);
       try {
         const [prodRes, revRes] = await Promise.all([
-          API.get(`/products/${productId}`),
-          API.get(`/products/${productId}/reviews`)
+          API.get(`/api/products/${productId}`),
+          API.get(`/api/products/${productId}/reviews`)
         ]);
         setProduct(prodRes.data.product);
         setReviews(revRes.data.reviews || []);
@@ -52,7 +52,7 @@ const Products = () => {
 
   const handleAddToCart = async () => {
     try {
-      await API.post('/cart/add', { productId, quantity: 1 });
+      await API.post('/api/cart/add', { productId, quantity: 1 });
       dispatch(addToCart({ productId, quantity: 1 }));
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
@@ -66,7 +66,7 @@ const Products = () => {
     setReviewLoading(true);
     setReviewError('');
     try {
-      const res = await API.post(`/products/${productId}/reviews`, reviewForm);
+      const res = await API.post(`/api/products/${productId}/reviews`, reviewForm);
       setReviews(prev => [...prev, res.data.review]);
       setReviewForm({ rating: 5, comment: '' });
     } catch (err) {
