@@ -29,18 +29,19 @@ const allowedOrigins = [
   process.env.FRONTEND_URL, // set this to your Vercel URL on Render
 ].filter(Boolean); // removes undefined if FRONTEND_URL not set
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (Postman, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    callback(new Error(`CORS blocked: ${origin}`));
-  },
-  credentials: true
-}));
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     // Allow requests with no origin (Postman, curl, server-to-server)
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
+//     callback(new Error(`CORS blocked: ${origin}`));
+//   },
+//   credentials: true
+// }));
 
+app.use(cors());
 // Serve uploaded images as static files (local dev only, prod uses Cloudinary)
 if (process.env.NODE_ENV !== 'production') {
   const __filename = fileURLToPath(import.meta.url);
