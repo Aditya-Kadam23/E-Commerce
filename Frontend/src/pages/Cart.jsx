@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
-import API from '../api/axios';
+import API from '../api/axios.js';
 import { useDispatch } from 'react-redux';
-import { removeFromCart } from '../cart/cartSlice';
+import { removeFromCart } from '../cart/cartSlice.js';
 
 const Cart = () => {
   const [cart, setCart] = useState(null);

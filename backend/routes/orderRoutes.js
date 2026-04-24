@@ -10,51 +10,59 @@ import Product from '../models/Product.js';
 const router = express.Router();
 
 router.post("/orders", authMiddleware, async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
         const { shippingAddress, paymentMethod } = req.body;
         if (!shippingAddress || !paymentMethod) {
-            throw new Error("missing required fields");
+            return res.status(400).json({ message: "missing required fields" });
         }
         const userId = req.user.id;
-        const cart = await Cart.findOne({ user: userId }).session(session);
+        // No session — local standalone MongoDB does NOT support transactions
+        const cart = await Cart.findOne({ user: userId });
 
         if (!cart) {
-            throw new Error("cart not found");
+            return res.status(404).json({ message: "cart not found" });
+        }
+        if (cart.cartItems.length === 0) {
+            return res.status(400).json({ message: "cart is empty" });
         }
 
-        if (cart.cartItems.length === 0) throw new Error("cart is empty");
         const totalPrice = cart.totalPrice;
+
         if (paymentMethod === "cod") {
+            // Check stock for all items first before creating anything
+            for (const item of cart.cartItems) {
+                const product = await Product.findById(item.product);
+                if (!product) return res.status(404).json({ message: "product not found" });
+                if (product.stock < item.quantity) return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
+            }
+
             const order = await Order.create({
                 user: userId,
                 orderItems: cart.cartItems,
                 totalPrice,
                 shippingAddress,
                 paymentStatus: "cod"
-            }, { session });
+            });
+
+            // Decrement stock for each item
             for (const item of cart.cartItems) {
-                const product = await Product.findById(item.product).session(session);
-                if (!product) throw new Error("product not found");
-                if (product.stock < item.quantity) throw new Error("Insufficient stock");
-                product.stock -= item.quantity;
-                await product.save({ session });
+                await Product.findByIdAndUpdate(item.product, {
+                    $inc: { stock: -item.quantity }
+                });
             }
-            await Cart.deleteOne({ user: userId }).session(session);
-            await session.commitTransaction();
+
+            // Clear the cart
+            await Cart.deleteOne({ user: userId });
+
             return res.status(201).json({
                 message: "order placed successfully",
                 order
             });
         }
 
-        return res.status(200).json({ message: "payment method not supported" });
+        return res.status(400).json({ message: "payment method not supported" });
     } catch (error) {
-        await session.abortTransaction();
         res.status(500).json({ message: error.message });
-    } finally {
-        await session.endSession();
     }
 });
 

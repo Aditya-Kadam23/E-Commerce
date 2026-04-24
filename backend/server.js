@@ -42,9 +42,11 @@ app.use(cors({
 }));
 
 // Serve uploaded images as static files (local dev only, prod uses Cloudinary)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+if (process.env.NODE_ENV !== 'production') {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);

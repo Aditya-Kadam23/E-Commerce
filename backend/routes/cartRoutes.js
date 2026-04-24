@@ -38,6 +38,7 @@ router.post("/add", authMiddleware, async (req, res) => {
                 ],
                 totalPrice: quantity * price
             });
+            console.log("cart created")
             return res.status(201).json({ message: "cart created" })
         }
         else {
@@ -46,7 +47,7 @@ router.post("/add", authMiddleware, async (req, res) => {
                 existsProduct.quantity += quantity;
                 cart.totalPrice += quantity * price;
                 await cart.save();
-
+                console.log("cart updated")
                 return res.status(200).json({ message: "cart updated" });
             }
             else {
@@ -58,7 +59,7 @@ router.post("/add", authMiddleware, async (req, res) => {
                 cart.totalPrice += quantity * price;
 
                 await cart.save();
-
+                console.log("product added to cart")
                 return res.status(200).json({ message: "Added new product" });
             }
         }
@@ -73,10 +74,11 @@ router.post("/add", authMiddleware, async (req, res) => {
 router.get("/", authMiddleware, async (req, res) => {
     try {
         // BUG FIX: was hardcoded userId — now uses real logged-in user
+        console.log("req.user:", req.user);
         const userId = req.user.id;
 
         const cart = await Cart.findOne({ user: userId }).populate("cartItems.product", "name price images");
-        
+
         if (!cart) {
             return res.status(200).json({ message: "cart is empty", cart: null });
         }
@@ -84,7 +86,7 @@ router.get("/", authMiddleware, async (req, res) => {
         cart.cartItems.forEach(item => {
             totalAmount += item.product.price * item.quantity;
         })
-        return res.status(200).json({message:"cart fetched successfully", cart, totalAmount});
+        return res.status(200).json({ message: "cart fetched successfully", cart, totalAmount });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

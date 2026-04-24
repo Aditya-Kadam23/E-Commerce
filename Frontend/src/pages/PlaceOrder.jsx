@@ -50,6 +50,13 @@ const PlaceOrder = () => {
         const res = await API.post('/payment/create-order', { shippingAddress });
         const { razorpayOrder } = res.data;
 
+        // Guard: Razorpay SDK might not have loaded from CDN yet
+        if (!window.Razorpay) {
+          setError('Payment gateway is not loaded. Please refresh the page and try again.');
+          setPlacing(false);
+          return;
+        }
+
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID || '',
           amount: razorpayOrder.amount,
@@ -58,13 +65,23 @@ const PlaceOrder = () => {
           description: 'Order Payment',
           order_id: razorpayOrder.id,
           handler: async (response) => {
-            await API.post('/payment/verify', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            setSuccess(true);
-            setTimeout(() => navigate('/orders'), 3000);
+            try {
+              await API.post('/payment/verify', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              setSuccess(true);
+              setTimeout(() => navigate('/orders'), 3000);
+            } catch (verifyErr) {
+              setError(verifyErr.response?.data?.message || 'Payment verification failed. Contact support.');
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setPlacing(false);
+              setError('Payment was cancelled.');
+            }
           },
           prefill: { name: user.name, email: user.email },
           theme: { color: '#FF6B35' }
@@ -72,6 +89,8 @@ const PlaceOrder = () => {
 
         const rzp = new window.Razorpay(options);
         rzp.open();
+        // Don't call setPlacing(false) here — modal is still open
+        return;
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to place order. Please try again.');
