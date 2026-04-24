@@ -39,7 +39,7 @@ ecommerce-project/
 
 ### 1. Clone the repository
 
-git clone https://github.com/your-username/ecommerce-project.git
+git clone https://github.com/Aditya-Kadam23/E-Commerce.git
 
 ### 2. Install dependencies
 
